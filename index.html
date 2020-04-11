@@ -1,0 +1,1683 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+
+	<title>Managing State of a Large React Application</title>
+
+	<meta name="description" content="Managing State of a Large application">
+	<meta name="author" content="Jhankar Mahbub">
+
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+	<link rel="stylesheet" href="css/reveal.css">
+	<link rel="stylesheet" href="css/theme/white.css" id="theme">
+
+	<link rel="shortcut icon" href="./img/favicon2.ico" type="image/x-icon">
+	<!-- Theme used for syntax highlighting of code -->
+	<link rel="stylesheet" href="lib/css/zenburn.css">
+	<link rel="stylesheet" href="css/custom.css">
+	<script src="https://use.typekit.net/jor2kyz.js"></script>
+	<script>try { Typekit.load({ async: true }); } catch (e) { }</script>
+
+	<!-- Printing and PDF exports -->
+	<script>
+		var link = document.createElement('link');
+		link.rel = 'stylesheet';
+		link.type = 'text/css';
+		link.href = window.location.search.match(/print-pdf/gi) ? 'css/print/pdf.css' : 'css/print/paper.css';
+		document.getElementsByTagName('head')[0].appendChild(link);
+	</script>
+
+	<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	<style>
+		.hide {
+			display: none !important;
+		}
+	</style>
+</head>
+
+<body>
+
+	<div class="reveal">
+		<!-- Any section element inside of this container is displayed as a slide -->
+		<div class="slides">
+			<section>
+				<h1>Manage state</h1>
+				<h5>of</h5>
+				<h3>A Large React App</h3>
+				<p>
+					<small>by
+						<!-- <a href="https://twitter.com/Karinaislam2">Karina</a> and -->
+						<a href="https://twitter.com/jsdude005">@JSDude005</a>
+					</small>
+					<br>	
+					<br>
+					<br>
+					<small>
+						<a href="http://thatjsdude.com/">www.thatJSDude.com</a>
+					</small>
+				</p>
+			</section>
+			<section>
+				<section>
+					<h2>Who is</h2>
+					<h1>JS Dude?</h1>
+				</section>
+				<section>
+					<img src="./img/others/dude.jpeg" alt="">
+					<ul>
+						<li style="color:purple">
+							<strong>@jsdude005</strong>
+						</li>
+						<li>Organize Chicago JavaScript Meetup</li>
+						<!-- <li>Sr. Web Developer, Nielsen</li> -->
+						<li>React, Redux and JavaScript Trainer</li>
+						<li>App to make learning fun again</li>
+						<!-- <li>Enjoy Learning, Talking about JavaScript</li> -->
+						<!-- <li>That Conference  Talk 2013 - 2018</li> -->
+					</ul>
+				</section>
+				<section>
+					<h2>Jump from 14,000ft </h2>
+					<img src="./img/others/jump.JPG" alt="">
+				</section>
+				<!-- <section>
+						<img src="./img/others/skydiving.JPG" alt="">
+					</section> -->
+				<section>
+					<h2>Marathon 2016, 2017</h2>
+					<img src="./img/others/marathon.jpg" alt="">
+				</section>
+				<section>
+					<h2>10,000 volts</h2>
+					<img src="./img/others/mudder.jpg" alt="">
+				</section>
+				<section>
+					<h4>international Javascript conference, London</h4>
+					<img src="./img/others/london.jpg" alt="">
+				</section>
+			</section>
+			<!-- <section>
+				<h2>Resources ok type</h2>
+				<ul>
+					<li><a href="https://itnext.io/react-state-management-patterns-908325dbb8f3">Very good ReactState management pattern</a>/li>
+					<li><a href=""></a>/li>
+					<li><a href=""></a>/li>
+					<li><a href="http://jamesknelson.com/5-types-react-application-state/">5 Type of React  Application States</a></li>
+					<li><a href="https://gist.github.com/sebmarkbage/ef0bf1f338a7182b6775">Enhance JS</a>></li>
+<li>What it means to be declarative
+<li>Composing behavior and explicit state with Higher-Order Components and Render Props
+<li>Composing behavior and implicit state with createContext and cloneElement
+<li>When to use a higher order component vs. a render prop vs. context vs. cloneElement, and the trade-offs that come with each choice
+				</ul>
+			</section> -->
+			<section>
+				<h2>We will cover</h2>
+				<ol>
+					<li>What is State</li>
+					<li>4 types of React state</li>
+					<li>5 Use cases to Manage state</li>
+					<li>Redux Core Concepts</li>
+					<li>Context Api</li>
+					<li>And we will have fun...</li>
+				</ol>
+			</section>
+			<section>
+				<section>
+					<h2>What is a state?</h2>
+				</section>
+				<section>
+					<h2>Think for a second...</h2>
+					<br>
+					<ul class="fragment">
+						<li>It's summer time</li>
+						<li class="fragment">You are sitting in the beach</li>
+
+					</ul>
+					<br>
+					<br>
+					<p class="fragment">Your state is:
+						<strong>pretty</strong>
+						<strong class="fragment  highlight-green"> RELAXED</strong>
+					</p>
+				</section>
+				<section>
+					<h2>Think for another second...</h2>
+					<br>
+					<ul class="fragment">
+						<li>You are in a big Conference</li>
+						<li class="fragment">Everyone is staring at you</li>
+					</ul>
+					<br>
+					<br>
+					<p class="fragment">Your state is:
+						<strong>pretty
+							<span class="fragment  highlight-red" style="text-transform:uppercase">nervous</span>
+						</strong>
+					</p>
+					<p class="fragment">
+						<small>This means state of your mind changes based on the situation</small>
+					</p>
+					<aside class="notes">
+						<li class="fragment1">Under a large beach umbrella</li>
+						<li class="fragment1">And your friend is grilling some steak</li>
+						<br>
+
+						<li class="fragment1">Talking in front of 30+ people</li>
+						<li class="fragment1">Trying to explain what is state</li>
+					</aside>
+				</section>
+				<section>
+					<h2>So what is a state?</h2>
+					<p class="fragment">State is something</p>
+					<ul class="fragment">
+						<li>That might change</li>
+						<li class="fragment">Like: your mood, your confidence level</li>
+						<!-- <li class="fragment">Or London Weather: winter, rain, 2 weeks of summer!</li> -->
+						<!-- <li class="fragment">Or your feelings about your partner</li> -->
+						<li class="fragment">Or types of cheese you add in your sandwich</li>
+					</ul>
+				</section>
+				<section>
+					<h2>What is changing in this pic?</h2>
+					<img src="./img/mario.gif" alt="">
+				</section>
+				<section>
+					<h2>What does changes in Facebook/Youtube?</h2>
+					<p>Due to user interaction.</p>
+				</section>
+				<!-- <section>
+					<h3>In an application</h3>
+					<p class="fragment">A lot of information stored in the memory</p>
+					<ol class="fragment">
+						<li>Variables</li>
+						<li>Classes</li>
+						<li>Data Structures</li>
+						<li>Data from server</li>
+					</ol>
+					<br>
+					<p class="fragment">
+						<small>All the stored information, at a given instant in time, creates the application state.</small>
+					</p>
+				</section> -->
+				<!-- <section>
+					<h2>Stateless</h2>
+					<p>I've seen and talked to developers lately who are obsessed with statelessness to the point of distraction. Its nice
+						to have statelessness for re-usability but its not realistic to pursue that goal in every situation over every other
+						goal unless you have a ton of resources to do that for some reason, like scaling.</p>
+					<br>
+				</section> -->
+			</section>
+			<section>
+				<section>
+					<h2>Think about an App</h2>
+					<h6>
+						<a target="_blank" href="https://ema-john.firebaseapp.com/shop">ema-john</a>
+					</h6>
+				</section>
+				<section>
+					<h2>In a React App</h2>
+					<p class="fragment">
+						<small>You can think of 4 types of state</small>
+					</p>
+					<ol>
+						<li class="fragment">Component State
+							<ul class="fragment">
+								<li>State stays within the component</li>
+								<li class="fragment1">Can only be updated within that component </li>
+
+							</ul>
+						</li>
+						<br>
+						<li class="fragment">Smart Component: HOC
+							<ul class="fragment">
+								<li>Container vs Presentation Component</li>
+								<li class="fragment">State still stays within the component</li>
+								<li class="fragment">Pass state, event handlers via Props</li>
+							</ul>
+						</li>
+						<aside class="notes">
+							<p>State still within the component. you pass state and state changing event handlers</p>
+							<p>to the child components. </p>
+						</aside>
+					</ol>
+					<p>
+						<small>
+							<a href="https://codeburst.io/how-to-manage-ui-state-with-redux-24deb6cf0d57">React States</a>
+						</small>
+					</p>
+				</section>
+				<section>
+					<h2>State in a React App</h2>
+					<ol start="3">
+						<li class="fragment">Application State: Global State
+							<ul>
+								<li class="fragment">Like: Session storage/Redux, database, etc.</li>
+								<li class="fragment">Any component, anywhere in the app can access</li>
+							</ul>
+						</li>
+						<br>
+						<li class="fragment">Provided State: Since React 16.3
+							<ul>
+								<li class="fragment">Each context has a provider and a consumer</li>
+								<li class="fragment">No need to pass context as prop-drilling</li>
+								<li class="fragment">Available anywhere under the component tree</li>
+							</ul>
+						</li>
+					</ol>
+
+				</section>
+				<section>
+					<h2>React States</h2>
+					<img src="./img/4StateOrdered.png" alt="">
+					<br>
+					<br>
+					<p>
+						<small>
+							<a href="https://itnext.io/react-state-management-patterns-908325dbb8f3">React State management pattern</a>
+						</small>
+					</p>
+				</section>
+			</section>
+			<section>
+				<section>
+					<h3>Use Case - 1</h3>
+					<h2>Building from scratch</h2>
+					<br>
+					<h2 class="hide">Think in React</h2>
+				</section>
+				<section>
+					<h3>Start with a mockup</h3>
+					<img src="./img/ema-john/product.png" alt="">
+					<!-- <img src="./img/mockup3.png" alt=""> -->
+
+				</section>
+				<section>
+					<h2>Data you have</h2>
+					<pre><code class="hljs javascript" data-trim contenteditable>
+							[
+							  {name: "Lenovo", price: "$649.99", stock: 12, ...},
+							  {name:"Mac the money sucker",price:"$1999.99",stock:8, ...},
+							  {name: "Dongle", price: "$29.99", stock: 12, ...},
+							  {name: "iPod Touch", price: "$699.99", stock: 1, ...},
+							  {name: "iPhone X", price: "$999.99", stock: 31, ...},
+							  {name: "Nexus 7", price: "$199.99", stock: 0, ...},
+							];
+												</code></pre>
+					<br>
+					<p>
+						<small>
+							<a href="https://reactjs.org/docs/thinking-in-react.html">Think in React</a>
+						</small>
+					</p>
+				</section>
+				<section>
+					<img src="./img/ema-john/loadData1.png" alt="">
+				</section>
+				<section>
+					<img src="./img/ema-john/loadData2.png" alt="">
+				</section>
+				<section>
+					<img src="./img/ema-john/loadData3.png" alt="">
+				</section>
+				<section>
+					<img src="./img/ema-john/loadData4.png" alt="">
+				</section>
+				<!-- <section>
+					<h4>You started loading data from the API</h4>
+					<pre><code class="hljs jsx" data-trim contenteditable>
+componentDidMount() {
+  Promise.all([
+    api.shop.getProducts(),
+    api.shop.getCurrentOrder()
+  ]).then(([products, order]) => {
+    // Extract ids of the products in my order now
+    const orderProductIds = order.map(p => p.id);
+    // Set "selected" flag on all products
+    const uiProducts = products.map(p => {
+      const selected = orderProductIds.indexOf(p.id) !== -1;
+      return { ...p, selected };
+    });
+    this.setState({ products: uiProducts, order });
+  });
+}
+					</code></pre>
+					<p class="fragment">Adding two lists in the state</p>
+					<p><small class="fragment">(this is simplified state)</small></p>
+					<aside class="notes">
+						<p>You started building part of it</p>
+					</aside>
+				</section> -->
+				<!-- <section>
+					<img src="./img/render1.png" alt="">
+					<pre><code class="hljs xml">
+render() {
+  return (
+    <ul>
+    {this.state.products.map(product => (
+      <li key={product.id}> {product.name} {product.price}
+        <button 
+          onClick={e => this.toggleProductInOrder(product)}>
+          {!product.selected ? 'Add' : 'Remove'}
+        </button>
+      </li>)}
+    </ul>
+  );
+}
+					</code></pre>
+				</section> -->
+				<section>
+					<h2>Render State</h2>
+					<img src="./img/ema-john/renderProduct.png" alt="">
+				</section>
+				<section>
+					<img src="./img/ema-john/renderProduct1.png" alt="">
+				</section>
+				<section>
+					<img src="./img/ema-john/renderProduct2.png" alt="">
+				</section>
+				<section>
+					<h4>Handle a product toggle</h4>
+
+					<img src="./img/ema-john/toggle1.png" alt="">
+				</section>
+
+				<section>
+					<img src="./img/ema-john/toggle2.png" alt="">
+				</section>
+				<section>
+					<img src="./img/ema-john/toggle3.png" alt="">
+				</section>
+				<!-- <section>
+					<h4>Handle a product toggle</h4>
+					<pre><code class="hljs es6 jsx" data-trim contenteditable>
+toggleProductInOrder(product) {
+  // Take all products, flip selection of the toggled one
+  const newProducts = this.state.products.map(p => {
+    if (p.id !== product.id) { return p; }
+    return { ...p, selected: !p.selected };
+  });
+  // Filter out the selected products
+  const newOrderProducts = newProducts.filter(p => p.selected);
+  // Update both the order and the products
+  return api.shop.updateOrder(newOrderProducts)
+    .then(newOrder => {
+      this.setState({ order: newOrder, products: newProducts });
+    });
+}
+					</code></pre>
+				</section> -->
+				<section>
+					<h4>Can we make state simpler?</h4>
+					<ul class="fragment">
+						<li> Try to Avoid changing data you get from the API</li>
+						<li class="fragment">Handle Derived Property in Render</li>
+						<li class="fragment">Avoid 2 or more state change with one event</li>
+					</ul>
+					<pre class="fragment"><code class="hljs javascript es6" data-trim contenteditable>
+componentDidMount() {
+  Promise.all([ 
+    api.shop.getProducts(), 
+    api.shop.getCurrentOrder()
+  ]).then(([products, order]) => {
+    // No pre-processing of our data from the server
+    this.setState({ products, order });
+  });
+}
+					</code></pre>
+					<pre class="fragment"><code class="hljs javascript es6" data-trim contenteditable>
+						getSelected(product) {
+						  return this.state.order.find(p => p.id === product.id);
+						}
+											</code></pre>
+
+					<!-- <pre class="fragment"><code class="hljs javascript es6" data-trim contenteditable>
+render() {
+  const { order, products } = this.state;
+  return (<ul>
+    {products.map(product => (
+      <li key={product.id}> {product.name} {product.price}
+        <button type="button"
+          onClick={() => this.toggleProductInOrder(product)}>
+          {!this.getSelected(product) ? 'Add' : 'Remove'}
+        </button>
+      </li>
+    )}
+  </ul>);
+}
+					</code></pre> -->
+				</section>
+				<section>
+					<img src="./img/render2.png" alt="">
+					<br>
+					<p>
+						<small>If possible calculate derived properties of your data during render()</small>
+					</p>
+				</section>
+				<section>
+					<h2>Toggle Product</h2>
+					<br>
+					<pre><code class="hljs" data-trim contenteditable>
+toggleProductInOrder(product) {
+  const order = this.state.order;
+  const selectedProduct = this.getSelected(product);
+	
+  //Either add or remove the item in the order list
+  const updatedOrder = selectedProduct
+	? without(order, product) : concat(order, product) ;
+	
+  return api.shop.updateOrder(updatedOrder).then(newOrder =>{
+    this.setState({ order: newOrder }); //update state
+  });
+}
+</code></pre>
+					<br>
+					<p>
+						<small>
+							<a href="https://monicalent.com/blog/2017/07/23/manage-state-in-react/">Manage State in React</a>
+						</small>
+					</p>
+				</section>
+				<section>
+					<h2>Digestible example</h2>
+					<p>Compute From states</p>
+					<pre class="fragment"><code  class="hljs js" data-trim>
+	class MyComponent extends Component {
+	  constructor(props) {
+	    super(props);
+	    this.state = { message: props.message + "!" };
+	  }
+	  getDerivedStateFromProps(props) {
+	    this.setState({ message: props.message + "!" });
+	  }
+	  render() {
+	    return (
+	      <div>{this.state.message}</div>
+	    );
+	  }
+	}
+						</code></pre>
+					<p class="hide">
+						<small>Are you using states where you don't have to?</small>
+					</p>
+				</section>
+				<section>
+					<p>Just read from the props/state</p>
+					<pre><code class="hljs javaScript jsx" data-trim>
+	render() {
+	  const excitedMessage = this.props.message + "!";
+	  return (<div>{excitedMessage}</div>);
+	}
+						</code></pre>
+					<br>
+					<p class="fragment">
+						<small>Avoid using state for data which can be calculated from props or other state</small>
+					</p>
+				</section>
+				<!-- <section>
+					<h2>Composable function React</h2>
+					<h2>Google it</h2>
+				</section> -->
+			</section>
+			<section>
+				<section>
+					<h3>Use Case - 2</h3>
+					<h2>Where to put the state?</h2>
+				</section>
+				<!-- <section>
+					<h2>What if you can</h2>
+					<h4>Recreate the wheel</h4>
+					<img src="./img/wheel.jpg" alt="">
+				</section> -->
+				<section>
+					<h3> Identify Component Hierarchy</h3>
+					<ul class="fragment">
+						<li>Draw boxes around component</li>
+						<li>Use Single responsibility principle</li>
+						<li>One component should ideally do one thing</li>
+						<li>Think about re-usability</li>
+					</ul>
+					<!-- <img src="./img/mockup-component3.png" alt="" class="fragment"> -->
+					<aside class="notes">
+						<p> draw boxes around every component (and subcomponent) </p>
+						<p>What should be a compoent</p>
+						<p>use single responsibility principle,</p>
+						<p>that is, a component should ideally only do one thing. </p>
+						<small>If it ends up growing, it should be decomposed into smaller subcomponents.</small>
+					</aside>
+				</section>
+				<section>
+					<h2>Name your components</h2>
+					<img src="./img/ema-john/products2.png" alt="">
+					<!-- <ol>
+						<li>ProductRow (red)</li>
+						<li>ProductContainer (green) </li>
+						<li>SearchBar (blue)</li>
+						<li>FilterableProductContainer (orange)</li>
+					</ol>
+					<img src="./img/mockup-component3.png" alt="" class="fragment"> -->
+					<aside class="notes">
+						FilterableProductContainer (orange): contains the entirety of the example
+						<br> SearchBar (blue): receives all user input
+						<br> ProductContainer (green): displays and filters the data collection based on user input
+						<br> ProductRow (red): displays a row for each product
+					</aside>
+				</section>
+				<!-- <section>
+						<h2>Create Component without interactions</h2>
+					</section> -->
+				<!-- <section>
+					<h2>Data you might have...</h2>
+					<p>
+						<small>During Run time</small>
+						</h4>
+						<table>
+							<tr>
+								<td>
+									<ul>
+										<li>List of products</li>
+										<li class="fragment">Order list</li>
+										<li class="fragment">Search text the user has entered</li>
+										<li class="fragment">Value of the checkbox</li>
+										<li class="fragment">Filtered list of products</li>
+									</ul>
+								</td>
+								<td>
+									<img src="./img/mockup3.png" alt="">
+								</td>
+							</tr>
+						</table>
+
+				</section> -->
+				<section>
+					<h4>Identify UI State</h4>
+					<!-- <p class="fragment highlight-red">It's not a React state if...</p>
+					<div class="fragment">
+
+						<ol>
+							<li>Just passed from parent via props</li>
+							<li>Remain unchanged over time</li>
+							<li>Can be computed by using other state/props</li>
+						</ol>
+					</div> -->
+					<img src="./img/ema-john/products.png" alt="">
+				</section>
+				<section>
+					<img src="./img/ema-john/products3.png" alt="">
+				</section>
+
+				<section>
+					<h2>Where to put the state</h2>
+					<ol class="fragment">
+						<li>Identify component that just has to render</li>
+						<li class="fragment">Put state in the common owner in the higher up</li>
+						<li class="fragment">If you don't find a common owner, create one</li>
+					</ol>
+					<p class="fragment">
+						<small>(Apply these 3 rules)</small>
+					</p>
+					<ul class="fragment">
+						<li>
+							ProductContainer doesn't have filters information</li>
+						<li>SearchBar doesn't have product list</li>
+						<li class="fragment">
+							<code>cart</code> doesn't have selected product price</li>
+						<li class="fragment"> Created
+							<code>Shop</code> Component to contain the state
+						</li>
+					</ul>
+					<p>
+						<small>
+							<a target="_blank" href="https://github.com/khan4019/ema-john">working code</a>
+						</small>
+					</p>
+					<br>
+				</section>
+				<!-- <section>
+					<h2>
+						<strong class="fragment highlight-green">state</strong> me if you can...</h2>
+					<img src="./img/mockup-component3.png" alt="">
+					<ul>
+						<small>
+							<li>Products: state (could be a property)</li>
+							<li class="fragment">Filtered product can be computed via search text and checkbox: not state
+							</li>
+							<li class="fragment">Is item selected: not state</li>
+							<li class="fragment">Order list changes on toggle: state</li>
+							<li class="fragment">Search text user can entered: state</li>
+							<li class="fragment">Value in the checkbox: state</li>
+						</small>
+					</ul>
+				</section>
+				<section>
+					<img src="./img/state.jpg" alt="">
+					<br>
+					<p>
+						<small>
+							<a href="https://twitter.com/dan_abramov/status/749710501916139520/photo/1">should be state or not</a>
+						</small>
+					</p>
+				</section> -->
+				<section>
+					<h2>Summary</h2>
+					<ul>
+						<li>Try not to change data you get from server </li>
+						<li>Avoid storing data in
+							<code>this.state</code> which can be calculated from props/state</li>
+
+						<li>Try to put derived property in render()</li>
+						<li>Try to avoid single event changing multiple state</li>
+					</ul>
+					<br>
+					<br>
+					<p>
+						<small>
+							<a href="https://medium.com/react-ecosystem/how-to-handle-state-in-react-6f2d3cd73a0c">Handle state in React</a>
+						</small>
+					</p>
+				</section>
+				<section>
+					<h2>Quiz Time ???</h2>
+					<p class="fragment">What is the name of the app?</p>
+				</section>
+			</section>
+			<section>
+
+				<section>
+					<h3>Use Case - 3</h3>
+					<h2>You have a little mess</h2>
+				</section>
+				<section>
+					<p>Your manager tells you to</p>
+					<h3>Add more features...</h3>
+					<img src="./img/ema-john/header.png" alt="">
+				</section>
+				<section>
+					<img src="./img/ema-john/shop.png" alt="">
+				</section>
+				<section>
+					<img src="./img/ema-john/review.png" alt="">
+				</section>
+				<section>
+					<h2>More features mean...</h2>
+					<ul class="fragment">
+						<li>More components</li>
+						<li>More data, more props has to pass data</li>
+						<li class="fragment">More event handler has to be managed</li>
+						<li class="fragment">State grows and becomes complicated</li>
+						<br>
+						<li class="fragment"> And you create more mess...</li>
+					</ul>
+					<br>
+					<br>
+					<p class="fragment">
+						<small>But Don't worry: the bigger is the mess, this higher is the job security</small>
+					</p>
+				</section>
+				<section data-background="./img/sheldon.gif">
+					<h2 class="fragment highlight-red">
+						<strong>Redux</strong>
+					</h2>
+					<p>Will start knocking at your door</p>
+					<aside class="notes">
+					</aside>
+				</section>
+				<section>
+					<h2>Redux will ask you</h2>
+					<ul>
+						<li>Put app state out of your component</li>
+						<li class="fragment">Create state as plain objects and arrays</li>
+						<li class="fragment">Describe changes as plain objects</li>
+						<li class="fragment">Handling changes as pure functions</li>
+					</ul>
+					<br>
+					<br>
+					<p class="fragment">
+						<small>None of these is a must to build an app</small>
+					</p>
+				</section>
+				<section>
+					<h3>Adding
+						<span class="fragment highlight-green">Redux</span>
+					</h3>
+					<img src="./img/worse.jpg" alt="">
+					<ul>
+						<li class="fragment">Will add an indirection to your problem</li>
+						<li class="fragment">Will shift the complexity in a different direction</li>
+						<li class="fragment">Could make your situation
+							<strong class="fragment highlight-red"> WORSE</strong>
+						</li>
+					</ul>
+					<p class="fragment">Is redux a must?</p>
+					<aside class="notes">
+						<h2>Question arises...</h2>
+						<p>Answer is: you dont have to</p>
+					</aside>
+				</section>
+				<section>
+					<h3>Asses your application</h2>
+						<ul>
+							<!-- <li>Is it more than 20 components?</li> -->
+							<li class="fragment">How many sibling Components have to communicate?</li>
+							<li class="fragment">Does child component contain state from parent component?</li>
+							<li class="fragment">How many different views need to share state?</li>
+						</ul>
+				</section>
+				<section>
+					<h2>Asses your team</h2>
+					<ul class="fragment">
+						<li>Do a proof of concept in a feature branch</li>
+						<li class="fragment">Explore how it solves the problem before diving into it</li>
+						<span class="fragment">
+							<li>Does team understand: Redux core concepts. </li>
+							<li>Can handle extra level of complexity</li>
+							<li>Immutabilty, pure function, etc.</li>
+						</span>
+					</ul>
+				</section>
+			</section>
+			<section>
+				<!-- <section>
+					<h2>Higher order component</h2>
+
+					<ol>
+						<li>Divide components into containers and presenters</li>
+						<li>Pass callbacks to hand as state change in children</li>
+						<li>State sharing components in container</li>
+					</ol>
+					<br>
+					<br>
+					<p>
+						<a target="_blank" href="https://reactjs.org/docs/lifting-state-up.html">Lifting up state</a>
+					</p>
+					<pre class="hide"><code class="hljs javaScript jsx" data-trim>
+					class Container extends Component {
+					  state = { text: 'foo' }
+					  changeText = newText => this.setState({text: newText})
+					  render() {
+					    return(&lt;div&gt;
+					       <Presenter1 text={this.state.text} changeText={this.changeText} />
+					       <Presenter2 text={this.state.text} />
+					    &lt;div&gt;)
+					    }
+					}
+					</code></pre>
+				</section> -->
+				<section>
+					<h2>Lighter State Management</h2>
+					<ul>
+						<li>Higher Order Component</li>
+						<li>Local Storage</li>
+						<li>Route Parameter</li>
+						<li>Database (if you are already using it)</li>
+					</ul>
+					<br>
+					<br>
+					<br>
+					<p>
+						<small>
+							<a target="_blank" href="https://ema-john.firebaseapp.com/shop">ema-john</a>
+						</small>
+					</p>
+				</section>
+				<section>
+					<h2>Summary</h2>
+					<ol>
+						<li>
+							<a href="http://">Think in React</a>
+						</li>
+						<li>
+							<a href="">Read about composition</a>
+						</li>
+						<li>Find where to put your state</li>
+						<li class="fragment">
+							<a href="https://medium.com/@dan_abramov/you-might-not-need-redux-be46360cf367">You Might Not Need Redux</a>
+						</li>
+						<li class="fragment">You can apply ideas from Redux without using it</li>
+						<li class="fragment">Come back to Redux if you find a real need for it</li>
+					</ol>
+					<br>
+					<br>
+					<p>
+						<small>
+							<a href="https://monicalent.com/blog/2017/07/23/manage-state-in-react/">React state without Redux</a>
+						</small>
+					</p>
+				</section>
+				<section>
+					<img src="./img/fun/knowWhy.jpg" alt="">
+					<aside class="notes">
+						<h2>Don't do it as if someone told you to do it</h2>
+					</aside>
+				</section>
+				<section>
+					<img src="./img/fun/useOnlyWhatYouNeed.jpg" alt="">
+				</section>
+				<section>
+					<img src="./img/fun/electricity.gif" alt="">
+				</section>
+				<section>
+					<img src="./img/fun/sleeping.jpg" alt="">
+				</section>
+				<section>
+					<h2>Quiz Time ???</h2>
+					<p class="fragment">Who was the guy knocking at the door?</p>
+					<img src="./img/knock.jpg" alt="" class="fragment">
+				</section>
+			</section>
+			<section>
+				<section>
+					<h2>Use Case - 4</h2>
+					<h3>State management library: Redux</h3>
+					<br>
+					<p>When you need to share state a lot</p>
+				</section>
+				<section>
+					<img src="./img/fun//fly.jpg" alt="">
+					<aside class="notes">
+						<p>Framework will do the hard lift</p>
+					</aside>
+				</section>
+				<section>
+					<img src="./img/redux/componentTree1.png" alt="">
+				</section>
+				<section>
+					<img src="./img/redux/componentTree2.png" alt="">
+				</section>
+				<section>
+					<img src="./img/redux/componentTree3.png" alt="">
+				</section>
+				<section>
+					<img src="./img/redux/componentTree5.png" alt="">
+				</section>
+				<section>
+					<h2>What if we put them in one place</h2>
+				</section>
+				<section>
+					<img src="./img/redux/centralState1.png" alt="">
+				</section>
+				<section>
+					<img src="./img/redux/centralState3.png" alt="">
+				</section>
+				<section>
+					<img src="./img/redux/centralState4.png" alt="">
+				</section>
+				<section>
+					<img src="./img/redux/centralState5.png" alt="">
+				</section>
+				<section>
+					<h2>Store</h2>
+					<ul>
+						<li>Holds application state</li>
+						<li>Only one store for all its application state</li>
+						<li>Single source of truth</li>
+					</ul>
+				</section>
+				<section>
+					<img src="./img/redux/solve2.png" alt="">
+				</section>
+				<section>
+					<h2>How will we change the state?</h2>
+				</section>
+				<section>
+					<img src="./img/redux/centralState6.png" alt="">
+				</section>
+				<section>
+					<h2>Action</h2>
+					<ul>
+						<li>Actions</li>
+						<li>Action container</li>
+					</ul>
+					<pre><code class="hljs JavaScript">
+{
+  type: 'ADD_TODO',
+  text: 'Take 8 bathroom breaks'
+}
+						</code></pre>
+					<li class="fragment">dispatch action</li>
+					<aside class="notes">
+						<p>Actions are plain JavaScript objects. Actions must have a type property that indicates the type of action being performed.
+						</p>
+					</aside>
+				</section>
+				<section>
+					<img src="./img/redux/centralState7.png" alt="">
+				</section>
+				<section>
+					<h2>But you didn't tell how state will change?</h2>
+				</section>
+				<section>
+					<h2>Actually state will not change</h2>
+					<h4 class="fragment">we will create a new state with the change</h4>
+					<pre class="fragment"><code>
+function add(x, y){
+  return x + y;
+}
+						</code></pre>
+					<pre class="fragment" data-trim><code>
+add(1, 2); // output is 3
+add(1, 2); // output still is 3
+add(1, 2); // WILL ALWAYS output 3
+						</code></pre>
+				</section>
+				<section>
+					<img src="./img/redux/stateChange8.png" alt="">
+				</section>
+				<section>
+					<img src="./img/redux/stateChange9.png" alt="">
+				</section>
+				<section>
+					<h2>reducer</h2>
+					<ul>
+						<li>Actions describe the fact that something happened</li>
+						<li class="fragment">Action don't specify how the application's state should change</li>
+						<li class="fragment">How state will change will be defined by
+							<strong>reducer</strong>
+						</li>
+					</ul>
+					<pre class="fragment"><code>
+case ADD_TODO:
+  return [
+  ...todos,
+  {
+    text: action.text,
+    completed: false
+  }
+]
+						</code></pre>
+				</section>
+				<section>
+					<h2>reducer</h2>
+					<img src="./img/redux/reducer.png" alt="">
+				</section>
+				<section>
+					<h2>Data Flow</h2>
+					<ul>
+						<li>Action is a plain object describing what happened</li>
+						<li class="fragment">Call store.dispatch(action) from anywhere in your app</li>
+						<li class="fragment">Store calls the reducer function you gave for the given action</li>
+						<li class="fragment">In root reducer you may combine multiple reducers into a single state tree</li>
+						<li class="fragment">Store saves the complete state tree returned by the root reducer</li>
+					</ul>
+					<br>
+					<br>
+					<p>
+						<small>
+							<a href="https://blog.mapbox.com/redux-for-state-management-in-large-web-apps-c7f3fab3ce9b">Redux state management</a>
+						</small>
+					</p>
+				</section>
+				<section>
+					<h2>Basic Building Block</h2>
+					<ul>
+						<li>Store</li>
+						<li>Action</li>
+						<li>Dispatch</li>
+						<li>Reducer</li>
+					</ul>
+				</section>
+				<!-- <section>
+					<h2>Implement Redux</h2>
+					<pre><code class="hljs javascript">
+npm install --save redux
+npm install --save react-redux
+							</code></pre>
+				</section> -->
+				<section>
+					<img src="./img/redux/containerComponent.png" alt="">
+					<p>
+						<small>ref:
+							<a href="https://giamir.com/unit-testing-a-react-redux-app">unit test ract redux app</a>
+						</small>
+					</p>
+				</section>
+				<section>
+					<img src="./img/redux/smartcompoent.png" alt="">
+				</section>
+				<section>
+					<h2>See some code</h2>
+					<p>
+						<a href="https://github.com/khan4019/redux-todo">github.com/khan4019/redux-todo</a>
+					</p>
+					<br>
+					<br>
+					<p>
+						<small>
+							<a href="https://chariotsolutions.com/blog/post/react-application-state-management-with-redux/">state management</a>
+						</small>
+					</p>
+				</section>
+				<!-- <section> 
+						<h2>Redux is good..</h2>
+						<ol>
+							<li>Keep an history of your app</li>
+							<li>Time-travel over the actions </li>
+							<li>Even store the app state in the local storage</li>
+						</ol>
+						<p class="fragment">But it's not a silver bullet</p>
+						<br>
+						<p>
+							<small>
+								<a href="https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd?hl=en">Redux Dev tool</a>
+							</small>
+						</p>
+	
+						<aside class="notes">
+							<p>When you have issues with your Redux state, chances are you may have issues maintaining your entire application </p>
+						</aside>
+					</section>
+					<section>
+						<img src="./img/fun/lawnMower.jpg" alt="">
+						<aside class="notes">
+							<p>Framework's job is to make your life easier</p>
+						</aside>
+					</section>
+	
+					<section>
+						<h2>Messed up with Redux</h2>
+						<ul class="fragment">
+							<li>Do you have too many global action creators?</li>
+							<li>Do you have a huge reducer that manages everything?</li>
+							<li>Do you have conflicts between your actions or reducers that modify the same piece of state?</li>
+						</ul>
+						<aside class="notes">
+							<p>You can tell when an application has a good architecture when it’s divided into several small features that can be
+								easily extracted and published on a package manager and reused by another application</p>
+							<p>. If you decide you want to remove an entire feature of your app, you can simply unplug it and delete that entire folder
+								which contains the container and presentational components, reducers, actions, resources etc, and you know it will
+								be fine because the state is not coupled to any other feature. Quick, clean and easy.</p>
+						</aside>
+						<br>
+						<br>
+						<p>
+							<small>
+								<a href="https://medium.com/@alexmngn/how-to-use-redux-on-highly-scalable-javascript-applications-4e4b8cb5ef38">redux scaleable architecure</a>
+							</small>
+						</p>
+					</section>
+					<section>
+						<img src="./img/fun/sucks.jpg" alt="">
+					</section>
+					<section>
+						<h4>Consider</h4>
+						<ul class="fragment">
+							<li>Redux actions creators and reducers with feature</li>
+							<li>Create Data module for data that is not tightly bound to a container component</li>
+						</ul>
+						<ul>
+							<li class="fragment">Put distinct domains into sub-store and split reducers</li>
+							<div class="fragment">
+								<li>Isolate network communication in one place</li>
+								<li>Use Redux-saga or thunk (middleware)</li>
+							</div>
+							<div class="fragment">
+								<li>Use
+									<a href="https://gist.github.com/abhiaiyer91/aaf6e325cf7fc5fd5ebc70192a1fa170">selector</a> to pass bits of state to components</li>
+								<li>Consider
+									<a href="https://github.com/reactjs/reselect"> reselect </a> to optimize performance</li>
+							</div>
+						</ul>
+						<br>
+						<p>
+							<small>
+								<a href="https://redux.js.org/recipes/structuring-reducers/splitting-reducer-logic">slice reducer</a>,
+								<a href="https://hackernoon.com/selector-pattern-painless-redux-store-destructuring-bfc26b72b9ae">Destructuring react store</a>
+							</small>
+						</p>
+						 <p>
+								<small>
+									<a href="https://blog.mapbox.com/redux-for-state-management-in-large-web-apps-c7f3fab3ce9b">Redux for state management</a>
+								</small>
+							</p> 
+					</section>
+					<section>
+						<p>Is Redux more performant? No. In fact, it gets slightly slower with each new action that must be handled.</p>
+						<p>
+							Is Redux simpler? Certainly not.</p>
+							<p><a href="https://twitter.com/tjholowaychuk/status/957853652483416064">simple state</a></p>
+							<br>
+							<p><a href="https://hackernoon.com/redesigning-redux-b2baee8b8a38">Redesigning Redux</a></p>
+					</section> -->
+				<section>
+					<h2>Is Redux the only option?</h2>
+				</section>
+				<section>
+					<h4>MobX is one option</h4>
+					<table>
+						<thead>
+							<tr>
+								<th>Redux</th>
+								<th>MobX</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>single store</td>
+								<td>multiple stores</td>
+							</tr>
+							<tr>
+								<td>flat state</td>
+								<td>nested state</td>
+							</tr>
+							<tr>
+								<td>functional programming </td>
+								<td>OOP & reactive programming</td>
+							</tr>
+							<tr>
+								<td>immutable</td>
+								<td>mutable</td>
+							</tr>
+							<tr>
+								<td>plain JavaScript</td>
+								<td>“magic” JavaScript</td>
+							</tr>
+							<tr>
+								<td>more boilerplate</td>
+								<td>less boilerplate</td>
+							</tr>
+						</tbody>
+					</table>
+					<p>
+						<small>
+							<a href="https://mobx.js.org/">MobX</a>
+							,
+							<a href="https://www.robinwieruch.de/redux-mobx-confusion/"> Redux or MobX</a>
+						</small>
+						<small>,</small>
+						<small>
+							<a href="https://codeburst.io/mobx-vs-redux-with-react-a-noobs-comparison-and-questions-382ba340be09">MobX vs Redux</a>
+						</small>
+					</p>
+				</section>
+				<section>
+					<h2>Other options</h2>
+					<ul>
+						<li>
+							<a href="https://medium.com/react-native-training/unstated-the-setstate-of-react-state-management-8ce47b240e6d">Unstated</a>,
+							<a href="https://medium.com/react-native-training/unstated-the-setstate-of-react-state-management-8ce47b240e6d">Explore unstated</a>
+						</li>
+						<li>
+							<a href="https://hackernoon.com/redesigning-redux-b2baee8b8a38">Rematch: Redux best practices without the boilerplate</a>
+						</li>
+						<li>
+							<a href="https://www.reindex.io/blog/redux-and-relay/">Relay/Apollo & GraphQL</a>
+						</li>
+						<li>
+							<a href="">Local Storage</a>
+						</li>
+						<li>
+							<a href="">Just React</a>
+						</li>
+					</ul>
+
+				</section>
+
+				<section>
+					<img src="./img/fun/sleeping6.jpg" alt="">
+				</section>
+				<section>
+					<h2>Quiz Time ???</h2>
+					<br>
+					<br>
+					<p class="fragment">How many guys were sleeping in the class room?</p>
+				</section>
+			</section>
+			<section>
+				<section>
+					<h3>Use Case -5</h3>
+					<h2>Sharing Context</h2>
+					<p>New cool kid in the corner since React 16.3</p>
+				</section>
+				<section>
+					<h2>App Level settings?</h2>
+					<ul>
+						<li>Pass data through the component tree?</li>
+						<li class="fragment">Pass data manually every level as props</li>
+						<li class="fragment">Like: Current locale, theme, user Context</li>
+						<!-- <li class="fragment">Not very developer friendly.</li> -->
+					</ul>
+				</section>
+				<section>
+					<img src="./img/context1.png" alt="">
+				</section>
+				<section>
+					<h2>Context</h2>
+					<ul>
+						<li>Gives you the power to pass data to child component</li>
+						<li class="fragment">Without passing props down manually at every level</li>
+						<li class="fragment">Share values like these between components</li>
+					</ul>
+				</section>
+				<section>
+					<h2>Create Context</h2>
+					<img src="./img/context2.png" alt="">
+					<img class="fragment" src="./img/context3.png" alt="">
+				</section>
+				<section>
+					<img src="./img/context4.png" alt="">
+				</section>
+				<section>
+					<h2>API</h2>
+					<img src="./img/context5.png" alt="" class="fragment">
+					<img src="./img/context6.png" alt="" class="fragment">
+					<img src="./img/context7.png" alt="" class="fragment">
+					<p class="fragment">
+						<small>Don’t use context just to avoid passing props a few levels down.</small>
+					</p>
+					<aside class="notes">
+						<p>Stick to cases where the same data needs to be accessed in many components at multiple levels.</p>
+					</aside>
+				</section>
+				<section>
+					<h2>Advanced Usage</h2>
+					<ul>
+						<li class="fragment">Dynamic Context</li>
+						<li class="fragment">Updating Context from a Nested Component</li>
+						<li class="fragment">Consuming Multiple Contexts</li>
+						<li class="fragment">Accessing Context in Life cycle Methods</li>
+						<li class="fragment">Consuming Context with a HOC
+						</li>
+						<li class="fragment">Forwarding Refs to Context Consumers</li>
+					</ul>
+					<br>
+					<p>
+						<small>
+							<a href="https://reactjs.org/docs/context.html">Context API</a>
+						</small>
+					</p>
+				</section>
+				<section>
+					<h2>Use Context as State Manager</h2>
+					<br>
+					<br>
+					<p><a href="https://github.com/didierfranc/react-waterfall">React Waterfall</a></p>
+					<br>
+					<br>
+					<p>
+						<small>
+							<a href="https://medium.freecodecamp.org/replacing-redux-with-the-new-react-context-api-8f5d01a00e8c">Replacing Redux with the new React context API</a>
+						</small>
+					</p>
+				</section>
+			</section>
+			<!-- <section>
+				<section>
+					<h3>Use Case-5</h3>
+					<h2>Redux Saga</h2>
+					<p>When you need to handle async call with Redux</p>
+				</section>
+				<section>
+					<h2>Redux-saga</h2>
+					<ul>
+						<li>Handles application side effects</li>
+						<li>Asynchronous things like data fetching</li>
+						<li>Access the browser cache</li>
+
+					</ul>
+					<aside class="notes">redux-saga is a library that aims to make application side effects (i.e. asynchronous things like data fetching and
+						impure things like accessing the browser cache) easier to manage, more efficient to execute, simple to test, and better
+						at handling failures.</aside>
+				</section>
+				<section>
+					<h2>Redux-saga</h2>
+					<ul>
+						<li>A separate thread in your application</li>
+						<li>A redux middleware</li>
+						<li>Start, pause or cancel by redux actions</li>
+						<li>Can access redux state</li>
+						<li>Can dispatch redux actions</li>
+					</ul>
+					<small class="hide">easier to manage, more efficient to execute, simple to test, and better at handling failures.</small>
+				</section>
+				<section>
+					<h2>ES6 Generator</h2>
+					<pre class="hljs javascript"><code data-trim>
+	function *foo() {
+	  yield 1;
+	  yield 2;
+	  yield 3;
+	  yield 4;
+	  yield 5;
+	}
+						</code></pre>
+					<pre class="fragment hljs javascript"><code data-trim>
+	var fooed = foo();
+	fooed.next(); //{value: 1, done: false}	
+	fooed.next(); //{value: 2, done: false}	
+	fooed.next(); //{value: 3, done: false}	
+	fooed.next(); //{value: 4, done: false}	
+	fooed.next(); //{value: 5, done: false}	
+	fooed.next(); //{value: undefined, done: true}
+						</code></pre>
+				</section>
+				<section>
+					<h2>Saga Helpers</h2>
+					<ul>
+						<li>
+							<strong>put:</strong> dispatches an action.</li>
+						<li>
+							<strong>select:</strong> get data from the state</li>
+						<br>
+						<li class="fragment">
+							<strong>fork:</strong> performs a non-blocking operation </li>
+						<li class="fragment">
+							<strong>call:</strong> runs a function. If it returns a promise, pauses the saga until the promise is resolved.</li>
+						<br>
+						<li class="fragment">
+							<strong>take:</strong> pauses until action received.</li>
+
+						<li class="fragment">
+							<strong>takeEvery:</strong> return results for all the calls triggered.</li>
+						<li class="fragment">
+							<strong>takeLatest:</strong> If we trigger several cases, it’s going to ignore all of them except the last one</li>
+
+					</ul>
+				</section>
+				<section>
+					<h2>Create Saga</h2>
+					<pre class="hljs javascript"><code data-trim>
+	function* loadUser() {
+	  try {
+	    //1st step: call getUser,  then assign value to user
+	    const user = yield call(fetch,'/getUser',{method:'GET'});
+		
+	    //2nd step: dispatch action
+	    yield put({type: 'FETCH_USER_SUCCESS', payload: user});
+	  } 
+	  catch(error) {
+	    //optional step: if something fails dispatch fail
+      yield put({type: 'FETCH_FAILED', error});
+	  }
+	}
+							</code></pre>
+				</section>
+				<section>
+					<h2>Register Saga Generator</h2>
+					<pre class="hljs javascript"><code data-trim>
+	function* sagas() {
+	  yield[
+	   fork(loadUser),
+	   takeLatest('LOAD_DASHBOARD', loadDashboardSequenced)
+	  ];
+	}	
+						</code></pre>
+				</section>
+				<section>
+					<h2>Inject the Saga Middleware </h2>
+					<pre class="hljs javascript"><code data-trim>
+	import { applyMiddleware, createStore } from 'redux';
+	import createSagaMiddleware from 'redux-saga';
+	import reducers from './reducers';
+	import sagas from './sagas';
+	
+	const sagaMiddleware = createSagaMiddleware();
+	let middleware = applyMiddleware(sagaMiddleware);
+	
+	const store = createStore(reducers, middleware);
+	sagaMiddleware.run(sagas);
+	
+	// inject sagas into the middleware
+	sagaMiddleware.run(sagas); 
+	
+							</code></pre>
+				</section>
+
+				<section>
+					<h2>Advanced Usage</h2>
+					<ul>
+						<li>Nesting Sagas</li>
+						<li>Sequential Sagas</li>
+						<li>Race saga</li>
+						<li>Multiple Sagas</li>
+						<li>Task Cancellation</li>
+						<li>Testing Saga</li>
+					</ul>
+				</section>
+				<section>
+					<h2>Pros and Cons</h2>
+					<ul>
+						<li>Saga: easy to test sagas as call() returns a pure object</li>
+						<li>Thunk: normally requires you to include a mockStore</li>
+						<li>Sagas offer independent place to handle all side effects.</li>
+						<li>saga: comes with lots of helper functions</li>
+					</ul>
+					<ul class="fragment">
+						<li>Generator syntax.</li>
+						<li>Lots of concepts to learn.</li>
+					</ul>
+					<br>
+					<p>
+						<a href="https://stackoverflow.com/questions/34930735/pros-cons-of-using-redux-saga-with-es6-generators-vs-redux-thunk-with-es2017-asy/34933395#34933395">saga vs thunk</a>
+					</p>
+				</section>
+			</section> -->
+			<section>
+				<section>
+					<h1>Learn New thing</h1>
+				</section>
+				<section>
+					<h2>Learn react by building</h2>
+					<ul>
+						<li>Build an
+							<a target="_blank" href="https://ema-john.firebaseapp.com/">e-commerce site</a>
+						</li>
+					</ul>
+					<img class="fragment" style="height:500px;" src="./img/others/workshop1.jpg" alt="">
+				</section>
+				<section>
+					<p>
+						<a target="_blank" href="http://thatjsdude.com/">thatjsdude.com</a>
+					</p>
+					Email:
+					<span>khan4019@gmail.com</span>
+				</section>
+			</section>
+			<!-- <section>
+				<h2>References</h2>
+				<ul>
+					<li>
+						<a href="https://medium.freecodecamp.org/async-operations-using-redux-saga-2ba02ae077b3">Async operations using redux-saga</a>
+					</li>
+					<li>
+						<a href="https://wecodetheweb.com/2016/10/01/handling-async-in-redux-with-sagas/">Handling async in Redux with Sagas</a>
+					</li>
+					<li>
+						<a href="https://riad.blog/2015/12/28/redux-nowadays-from-actions-creators-to-sagas/">From actions creators to sagas</a>
+					</li>
+					<li>
+						<a href="https://medium.com/@tonypai/learn-redux-saga-with-simple-example-a7175417f9fd"> Redux Saga With Example</a>
+					</li>
+					<li>
+						<a href="https://medium.com/@wisecobbler/using-a-function-in-setstate-instead-of-an-object-1f5cfd6e55d1">Use set state as a function</a>
+					</li>
+					<li>
+						<a href="https://medium.com/grey-frogs/writing-more-testable-code-with-redux-saga-c1561f995225">Testable code with Saga</a>
+					</li>
+					<li>
+						<a href="https://github.com/markerikson/react-redux-links/blob/master/redux-side-effects.md">list of important resources</a>
+					</li>
+					<li>
+						<a href="https://stackoverflow.com/questions/34930735/pros-cons-of-using-redux-saga-with-es6-generators-vs-redux-thunk-with-es2017-asy/34933395#34933395">Saga vs thunk</a>
+					</li>
+				</ul>
+			</section> -->
+			<section>
+				<section>
+					<h2>Free tip</h2>
+				</section>
+				<section>
+					<p>Tight on food budget</p>
+					<img class="fragment" src="./img/banana.jpg" alt="">
+				</section>
+				<section>
+					<img src="./img/banana-single.jpg" alt="">
+				</section>
+				<section>
+					<p>Want to save more...</p>
+					<img class="fragment" src="./img/meetup.jpg" alt="">
+				</section>
+				<section>
+					<p>Save even more...</p>
+					<img class="fragment" src="./img/tshirt.jpeg" alt="">
+				</section>
+				<section>
+					<p>Ultimate saver...</p>
+					<img class="fragment" src="./img/gym.jpg" alt="">
+					<aside class="notes">
+						<p>Work extra hour in office...</p>
+						<p>You can stay in the office</p>
+						<p>If you need to take a shower once in a month...</p>
+						<p>get a free pass from LA Fitness or any other gym</p>
+					</aside>
+				</section>
+			</section>
+
+				<!-- <section>
+					<h4>4 Steps</h4>
+					<h2>to Appear Smart</h2>
+					<h3>in a Meeting</h3>
+					<aside class="notes">
+						<ul>
+							<li>Sleep 30min</li>
+							<li>wake up and go to the board</li>
+							<li>draw a venn diagram</li>
+							<li>spend 50min to talk</li>
+							<li>Ask the junior developer to reschedule the meeting</li>
+						</ul>
+					</aside>
+				</section>
+				<section>
+					<h4>Step - 1</h4>
+					<br>
+					<br>
+					<p class="fragment">Sleep first 30min</p>
+					<p>
+						<small class="fragment">Or use your cell phone</small>
+					</p>
+				</section>
+				<section>
+					<h4>Step-2</h4>
+					<img class="fragment" src="./img/fun/slideBack.png" alt="">
+					<img class="fragment" src="./img/fun/stepBack.png" alt="">
+				</section>
+				<section>
+					<h4>Step-3</h4>
+					<img src="./img/fun/scale.png" alt="">
+				</section>
+				<section>
+					<h4>Step-4</h4>
+					<img src="./img/fun/venn.png" alt="">
+					<ul>
+						<li class="fragment">Spend 50min to talk about the Sweet spot</li>
+						<li class="fragment">Ask the junior developer to reschedule the meeting</li>
+					</ul>
+				</section>
+				<section>
+					<h4>7 Tips</h4>
+					<h2>to Appear Busy</h2>
+					<h3>at Work</h3>
+				</section>
+				<section>
+					<h3>Appear Busy at Work</h3>
+					<ol>
+						<li class="fragment">Ctrl + 1 when big brother is around</li>
+						<br>
+						<li class="fragment">Always carry extra bag and print out</li>
+						<li class="fragment">Don't leave before ur manager</li>
+						<br>
+						<li class="fragment">Dont use the same rest room in a row</li>
+						<li class="fragment">Do lunch at your desk not break room</li>
+						<br>
+						<li class="fragment">Always leave a extra jacket on your chair</li>
+						<li class="fragment">Compose email during office hours, send it midnight or weekends</li>
+					</ol>
+					<br>
+					<a href="http://www.wikihow.com/Look-Busy-at-Work-Without-Really-Working">Look busy</a>
+				</section> -->
+			</section>
+			<!-- <section>
+				<h2>Learn React</h2>
+				<p>Day long Hand's on
+					<a href="https://github.com/hakimel/reveal.js#speaker-notes">workshop</a>
+				</p>
+				<img src="./img/workshop.jpg" alt="">
+				<aside class="notes">
+					Oh hey, these are some notes. They'll be hidden in your presentation, but you can see them if you open the speaker notes
+					window (hit 's' on your keyboard).
+				</aside>
+			</section> 
+			<section style="text-align: left;">
+				<h1>Thank you</h1>
+				<p>
+					-Workshop:
+					<a href="">Khan4019@gmail.com</a>
+					<br> -Slides:
+					<a href="https://khan4019.github.io/manage-state/index.html">khan4019.github.io/manage-state</a>
+					<br> -Intern:
+					<a href="">karina.islam0@gmail.com</a>
+				</p>
+			</section>-->
+			<section style="text-align: left;">
+				<h1>Thank you</h1>
+				<p>
+					-Slides:
+					 <a href="">@jsDude005</a>
+					<!-- <br> -Slides:
+					<a href="https://khan4019.github.io/manage-state/index.html">khan4019.github.io/manage-state</a> -->
+					<p>-Website:
+						<a href="http://thatjsdude.com">thatjsdude.com</a>
+					</p>
+					<!-- <p>-Youtube:
+						<a href="https://www.youtube.com/c/ThatJSDude">youtube.com/c/ThatJSDude</a>
+					</p> -->
+					<br>
+					<small>-Email:
+						<a href="https://twitter.com/jsdude005">khan4019@gmail.com</a>
+					</small>
+
+				</p>
+			</section>
+
+
+		</div>
+
+	</div>
+
+	<script src="lib/js/head.min.js"></script>
+	<script src="js/reveal.js"></script>
+
+	<script>
+
+		// More info https://github.com/hakimel/reveal.js#configuration
+		Reveal.initialize({
+			controls: true,
+			progress: true,
+			history: true,
+			center: true,
+
+			transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+			// More info https://github.com/hakimel/reveal.js#dependencies
+			dependencies: [
+				{ src: 'lib/js/classList.js', condition: function () { return !document.body.classList; } },
+				{ src: 'plugin/markdown/marked.js', condition: function () { return !!document.querySelector('[data-markdown]'); } },
+				{ src: 'plugin/markdown/markdown.js', condition: function () { return !!document.querySelector('[data-markdown]'); } },
+				{ src: 'plugin/highlight/highlight.js', async: true, callback: function () { hljs.initHighlightingOnLoad(); } },
+				{ src: 'plugin/search/search.js', async: true },
+				{ src: 'plugin/zoom-js/zoom.js', async: true },
+				{ src: 'plugin/notes/notes.js', async: true }
+			]
+		});
+
+	</script>
+
+</body>
+
+</html>
